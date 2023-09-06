@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1068595127005",
+    "project_id": "kanta-mynotes",
+    "storage_bucket": "kanta-mynotes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1068595127005:android:5f67b067a3bacd1697b134",
+        "android_client_info": {
+          "package_name": "com.example.mynotes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1068595127005-c8np9vrj80sm4rntp55bt35oet50imff.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5rWs70rGs6VBYxnl-XVz66fUca-qLN28"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1068595127005-c8np9vrj80sm4rntp55bt35oet50imff.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
