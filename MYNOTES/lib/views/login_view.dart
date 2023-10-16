@@ -1,8 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as devtols show log;
-
 import 'package:mynotes/constants/routes.dart';
+import 'package:mynotes/utilities/show_error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -73,15 +75,25 @@ class _LoginViewState extends State<LoginView> {
                   password: password,
                 );
                 devtols.log('userCredential: $userCredential');
-                // print(userCredential);
               } on FirebaseAuthException catch (e) {
+                // catch FirebaseAuthException
                 if (e.code == 'user-not-found') {
-                  devtols.log('No user found for that email.');
-                  // print('No user found for that email.');
+                  await showErrorDialog(
+                      context, 'No user found for that email.');
+
                 } else if (e.code == 'wrong-password') {
+                  await showErrorDialog(
+                      context, 'Wrong password provided for that user.');
                   devtols.log('Wrong password provided for that user.');
-                  // print('Wrong password provided for that user.');
+
+                } else {
+                  await showErrorDialog(context, 'Error: ${e.code}');
+                  devtols.log(e.code);
                 }
+              } catch (e) {
+                // catch all other errors that are not FirebaseAuthException
+                await showErrorDialog(context, 'Error: $e');
+                devtols.log(e.toString());
               }
               FirebaseAuth auth = FirebaseAuth.instance;
               UserCredential userCredential =
@@ -90,7 +102,7 @@ class _LoginViewState extends State<LoginView> {
                 password: password,
               );
               devtols.log('userCredential: $userCredential');
-              // print(userCredential);
+       
             },
             child: const Text('Login'),
           ),
@@ -105,3 +117,4 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 }
+
