@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as devtols show log;
 
+import 'package:mynotes/constants/routes.dart';
+
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
 
@@ -92,7 +94,7 @@ class _RegisterViewState extends State<RegisterView> {
               );
               devtols.log('userCredential: $userCredential');
               Navigator.of(context).pushNamedAndRemoveUntil(
-                '/notes',
+                notesRoute,
                 (route) => false,
               );
             },
@@ -102,7 +104,7 @@ class _RegisterViewState extends State<RegisterView> {
               onPressed: () {
                 Navigator.of(context)
                     .pushNamedAndRemoveUntil(
-                  '/login',
+                  loginRoute,
                   (route) => false,
                 );
               },
