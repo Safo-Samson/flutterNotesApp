@@ -1,8 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as devtols show log;
-
 import 'package:mynotes/constants/routes.dart';
+import 'package:mynotes/utilities/show_error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -70,22 +72,45 @@ class _RegisterViewState extends State<RegisterView> {
                   email: email,
                   password: password,
                 );
+
+                final user =
+                    FirebaseAuth.instance.currentUser; // get current user
+                await user
+                    ?.sendEmailVerification(); // send verification email to user email automatically
+
+                Navigator.of(context).pushNamed(
+                    verifyEmailRoute); // used pushNamed instead of pushNamedAndRemoveUntil because i dont want to replace the login screen but rather add the verify email screen on top of it.
                 devtols.log('userCredential: $userCredential');
-                // print(userCredential);
+
+
               } on FirebaseAuthException catch (e) {
+                // catching firebase errors
                 if (e.code == 'weak-password') {
+                  await showErrorDialog(
+                      context, "The password provided is too weak.");
                   devtols.log('The password provided is too weak.');
                 } else if (e.code == 'email-already-in-use') {
-                  devtols.log('The account already exists for that email.');
+                  await showErrorDialog(
+                      context, "The account already exists for that email.");
                 } else if (e.code == 'weak-password') {
-                  devtols.log('The password provided is too weak.');
+                  await showErrorDialog(
+                      context, "The password provided is too weak.");
                 } else if (e.code == 'invalid-email') {
-                  devtols.log('The email address is not valid.');
+                  await showErrorDialog(
+                      context, "The email address is not valid.");
                 } else if (e.code == 'email-already-in-use') {
-                  devtols.log(
-                      'The email address is already in use by another account.');
+                  await showErrorDialog(context,
+                      "The email address is already in use by another account.");
+                } else {
+                  await showErrorDialog(context, 'Error: ${e.code}');
+                  devtols.log(e.code);
                 }
+              } catch (e) {
+                // catching all other errors
+                await showErrorDialog(context, 'Error: $e');
+                devtols.log(e.toString());
               }
+
               FirebaseAuth auth = FirebaseAuth.instance;
               UserCredential userCredential =
                   await auth.createUserWithEmailAndPassword(
@@ -102,8 +127,7 @@ class _RegisterViewState extends State<RegisterView> {
           ),
           TextButton(
               onPressed: () {
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil(
+                Navigator.of(context).pushNamedAndRemoveUntil(
                   loginRoute,
                   (route) => false,
                 );
