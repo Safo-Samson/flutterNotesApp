@@ -74,9 +74,16 @@ class _LoginViewState extends State<LoginView> {
                   email: email,
                   password: password,
                 );
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil(notesRoute, (route) => false);
-                devtols.log('userCredential: $userCredential');
+                // navigate to notes view after sign in and making sure user is verified
+                if (!userCredential.user!.emailVerified) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      verifyEmailRoute, (route) => false);
+                } else {
+                  Navigator.of(context).pushNamedAndRemoveUntil(notesRoute,
+                      (route) => false); // navigate to notes view after sign in
+                }
+                
+              
               } on FirebaseAuthException catch (e) {
                 // catch FirebaseAuthException
                 if (e.code == 'user-not-found') {
