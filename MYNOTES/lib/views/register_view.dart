@@ -1,9 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:developer' as devtols show log;
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'dart:developer' as devtols show log;
 import 'package:mynotes/constants/routes.dart';
+import 'package:mynotes/services/auth/auth_exceptions.dart';
+import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/utilities/show_error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
@@ -66,60 +68,27 @@ class _RegisterViewState extends State<RegisterView> {
               final email = _emailController.text;
               final password = _passwordController.text;
               try {
-                final FirebaseAuth auth = FirebaseAuth.instance;
-                UserCredential userCredential =
-                    await auth.createUserWithEmailAndPassword(
-                  email: email,
-                  password: password,
-                );
+                await AuthService.firebase()
+                    .createUser(email: email, password: password);
 
-                final user =
-                    FirebaseAuth.instance.currentUser; // get current user
-                await user
-                    ?.sendEmailVerification(); // send verification email to user email automatically
+                // final user = FirebaseAuth.instance.currentUser;
+                AuthService.firebase().getCurrentUser; // get current user
+                AuthService.firebase()
+                    .sendEmailVerification(); // send verification email to user email automatically
 
                 Navigator.of(context).pushNamed(
                     verifyEmailRoute); // used pushNamed instead of pushNamedAndRemoveUntil because i dont want to replace the login screen but rather add the verify email screen on top of it.
-                devtols.log('userCredential: $userCredential');
-
-
-              } on FirebaseAuthException catch (e) {
-                // catching firebase errors
-                if (e.code == 'weak-password') {
-                  await showErrorDialog(
-                      context, "The password provided is too weak.");
-                  devtols.log('The password provided is too weak.');
-                } else if (e.code == 'email-already-in-use') {
-                  await showErrorDialog(
-                      context, "The account already exists for that email.");
-                } else if (e.code == 'weak-password') {
-                  await showErrorDialog(
-                      context, "The password provided is too weak.");
-                } else if (e.code == 'invalid-email') {
-                  await showErrorDialog(
-                      context, "The email address is not valid.");
-                } else if (e.code == 'email-already-in-use') {
-                  await showErrorDialog(context,
-                      "The email address is already in use by another account.");
-                } else {
-                  await showErrorDialog(context, 'Error: ${e.code}');
-                  devtols.log(e.code);
-                }
-              } catch (e) {
-                // catching all other errors
-                await showErrorDialog(context, 'Error: $e');
-                devtols.log(e.toString());
-              }
-
-              FirebaseAuth auth = FirebaseAuth.instance;
-              UserCredential userCredential =
-                  await auth.createUserWithEmailAndPassword(
-                email: email,
-                password: password,
-              );
-              devtols.log('userCredential: $userCredential');
+              } on WeakPasswordAuthException {
+                await showErrorDialog(context, 'Your password is weak.');
+              } on EmailAlreadyInUseAuthException {
+                await showErrorDialog(context, 'User Already Exists.');
+              } on InvalidEmailAuthException {
+                await showErrorDialog(context, 'Email is invalid.');
+              } on GenericAuthException {
+                await showErrorDialog(context, 'An error occured.');
+              } 
               Navigator.of(context).pushNamedAndRemoveUntil(
-                notesRoute,
+                verifyEmailRoute,
                 (route) => false,
               );
             },
