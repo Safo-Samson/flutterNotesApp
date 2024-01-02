@@ -74,18 +74,18 @@ class _LoginViewState extends State<LoginView> {
                   email: email,
                   password: password,
                 );
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil(notesRoute, (route) => false);
                 devtols.log('userCredential: $userCredential');
               } on FirebaseAuthException catch (e) {
                 // catch FirebaseAuthException
                 if (e.code == 'user-not-found') {
                   await showErrorDialog(
                       context, 'No user found for that email.');
-
                 } else if (e.code == 'wrong-password') {
                   await showErrorDialog(
                       context, 'Wrong password provided for that user.');
                   devtols.log('Wrong password provided for that user.');
-
                 } else {
                   await showErrorDialog(context, 'Error: ${e.code}');
                   devtols.log(e.code);
@@ -102,7 +102,6 @@ class _LoginViewState extends State<LoginView> {
                 password: password,
               );
               devtols.log('userCredential: $userCredential');
-       
             },
             child: const Text('Login'),
           ),
@@ -117,4 +116,3 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 }
-
