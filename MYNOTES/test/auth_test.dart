@@ -38,6 +38,44 @@ void main() {
         email: 'foo@bar.com',
         password: 'anypassword',
       );
+
+      expect(
+        badEmailUser,
+        throwsA(const TypeMatcher<UserNotFoundAuthException>()),
+      );
+
+      final badPasswordUser = provider.createUser(
+        email: 'any@email',
+        password: 'wrongpassword',
+      );
+
+      expect(
+        badPasswordUser,
+        throwsA(const TypeMatcher<WrongPasswordAuthException>()),
+      );
+
+      final goodUser = await provider.createUser(
+        email: 'any@email',
+        password: 'anypassword',
+      );
+
+      expect(provider.getCurrentUser, goodUser);
+      expect(goodUser.isEmailVerified, false);
+    });
+
+    test('Login user should be verified', () {
+      provider.sendEmailVerification();
+      final user = provider.getCurrentUser;
+      expect(user, isNotNull);
+      expect(user!.isEmailVerified, true);
+    });
+
+    test('Should be able to login and logout', () async {
+      await provider.logOut();
+      await provider.logIn(email: 'email', password: 'password');
+
+      final user = provider.getCurrentUser;
+      expect(user, isNotNull);
     });
   }); // end of group
 }
