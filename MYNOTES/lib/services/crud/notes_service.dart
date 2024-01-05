@@ -17,6 +17,11 @@ const textColumn = 'text';
 const isSyncedWithCloudColumn = 'is_synced_with_cloud';
 
 class NotesService {
+
+  // noteservice is a singleton class, meaning it will only be instantiated once
+  static final NotesService _instance = NotesService._sharedInstance();
+  NotesService._sharedInstance();
+  factory NotesService() => _instance;
   Database? _db;
 
   //  a list of notes that are cached in memory
@@ -32,6 +37,9 @@ class NotesService {
     _notes = allNotes.toList();
     _notesStreamController.add(_notes);
   }
+
+// a getter that returns the stream of notes
+  Stream<List<DatabaseNotes>> get allNotes => _notesStreamController.stream;
 
   Future<DatabaseUser> getOrCreateUser({required String email}) async {
     try {
@@ -60,6 +68,14 @@ class NotesService {
     } else {
       await db.close();
       _db = null;
+    }
+  }
+
+  Future<void> _ensureDbIsOpened() async {
+    try {
+      await open();
+    } on DatabaseAlreadyOpenedException {
+      // do nothing
     }
   }
 
@@ -106,6 +122,7 @@ class NotesService {
   }
 
   Future<void> deleteUser({required String email}) async {
+    await _ensureDbIsOpened();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(userTable,
         where: 'email = ?', whereArgs: [email.toLowerCase()]);
@@ -116,6 +133,7 @@ class NotesService {
   }
 
   Future<DatabaseUser> createUser({required String email}) async {
+    await _ensureDbIsOpened();
     final db = _getDatabaseOrThrow();
     final results = await db.query(
       userTable,
@@ -135,6 +153,7 @@ class NotesService {
   }
 
   Future<DatabaseUser> getUser({required String email}) async {
+    await _ensureDbIsOpened();
     final db = _getDatabaseOrThrow();
 
     final results = await db.query(
@@ -152,6 +171,7 @@ class NotesService {
   }
 
   Future<DatabaseNotes> createNote({required DatabaseUser owner}) async {
+    await _ensureDbIsOpened();
     final db = _getDatabaseOrThrow();
 
     // make sure the user exists with the given email and get the user id
@@ -183,6 +203,7 @@ class NotesService {
   }
 
   Future<void> deleteNote({required int id}) async {
+    await _ensureDbIsOpened();
     final db = _getDatabaseOrThrow();
     final deletedCount =
         await db.delete(noteTable, where: 'id = ?', whereArgs: [id]);
@@ -197,6 +218,7 @@ class NotesService {
   }
 
   Future<int> deleteAllNotes() async {
+    await _ensureDbIsOpened();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(noteTable);
 
@@ -208,6 +230,7 @@ class NotesService {
   }
 
   Future<DatabaseNotes> getNote({required int id}) async {
+    await _ensureDbIsOpened();
     final db = _getDatabaseOrThrow();
 
     final notes = await db.query(
@@ -231,6 +254,7 @@ class NotesService {
   }
 
   Future<Iterable<DatabaseNotes>> getAllNotes() async {
+    await _ensureDbIsOpened();
     final db = _getDatabaseOrThrow();
 
     final notes = await db.query(
@@ -246,6 +270,7 @@ class NotesService {
 
   Future<DatabaseNotes> updateNote(
       {required DatabaseNotes note, required String text}) async {
+    await _ensureDbIsOpened();
     final db = _getDatabaseOrThrow();
 
 // make sure the note exists
