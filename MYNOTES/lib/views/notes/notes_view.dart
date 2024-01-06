@@ -72,8 +72,11 @@ class _NotesViewState extends State<NotesView> {
                     stream: _notesService.allNotes,
                     builder: (context, snapshot) {
                       switch (snapshot.connectionState) {
+                        // this is called fallthrough case
                         case ConnectionState.waiting:
+                        case ConnectionState.active:
                           return const Text('Waiting on all notes');
+
                         default:
                           return const Center(
                               child: CircularProgressIndicator());
