@@ -33,8 +33,14 @@ class _NotesViewState extends State<NotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Main UI'),
+          title: const Text('Your Notes'),
           actions: [
+            IconButton(
+                onPressed: () {
+                  // pusnNamed() is used to navigate to a route back to the previous route with the back button on the appbar
+                  Navigator.of(context).pushNamed(newNoteRoute);
+                },
+                icon: const Icon(Icons.add)),
             PopupMenuButton<MenuAction>(onSelected: (action) async {
               switch (action) {
                 case MenuAction.logout:
