@@ -6,7 +6,8 @@ class NewNotesView extends StatefulWidget {
   const NewNotesView({super.key});
 
   @override
-  _NewNotesViewState createState() => _NewNotesViewState();
+  // NewNotesViewState createState() => NewNotesViewState();
+  State<NewNotesView> createState() => _NewNotesViewState();
 }
 
 class _NewNotesViewState extends State<NewNotesView> {

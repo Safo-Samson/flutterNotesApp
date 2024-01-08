@@ -1,8 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:mynotes/constants/routes.dart';
 import 'package:mynotes/enums/menu_actions.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/services/crud/notes_service.dart';
+// import 'dart:developer' as devtols show log;
 
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
@@ -23,11 +26,7 @@ class _NotesViewState extends State<NotesView> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _notesService.close(); // close the database
-    super.dispose();
-  }
+  // theres no dispose function because the database will be closed automatically when the app is closed
 
   @override
   Widget build(BuildContext context) {
@@ -75,13 +74,35 @@ class _NotesViewState extends State<NotesView> {
                         // this is called fallthrough case
                         case ConnectionState.waiting:
                         case ConnectionState.active:
-                          return const Text('Waiting on all notes');
+                          if (snapshot.hasData) {
+                            final allNotes =
+                                snapshot.data as List<DatabaseNotes>;
 
+                            return ListView.builder(
+                                itemCount: allNotes.length,
+                                itemBuilder: (context, index) {
+                                  final note = allNotes[index];
+
+                                  return ListTile(
+                                    title: Text(
+                                      note.text,
+                                      maxLines: 1,
+                                      softWrap: true, // to wrap the text
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  );
+                                });
+                            
+                          } else {
+                            return const Center(
+                                child: Text('You have no notes yet'));
+                          }
                         default:
                           return const Center(
                               child: CircularProgressIndicator());
                       }
                     });
+               
               default:
                 return const Center(child: CircularProgressIndicator());
             }

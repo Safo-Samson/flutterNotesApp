@@ -17,19 +17,22 @@ const textColumn = 'text';
 const isSyncedWithCloudColumn = 'is_synced_with_cloud';
 
 class NotesService {
-
   // noteservice is a singleton class, meaning it will only be instantiated once
-  static final NotesService _instance = NotesService._sharedInstance();
-  NotesService._sharedInstance();
-  factory NotesService() => _instance;
+  static final NotesService _shared = NotesService._sharedInstance();
+  NotesService._sharedInstance() {
+    _notesStreamController = StreamController<List<DatabaseNotes>>.broadcast(
+      onListen: () {
+        _notesStreamController.sink.add(_notes); // add the notes to the stream
+      },
+    );
+  }
+  factory NotesService() => _shared;
   Database? _db;
 
   //  a list of notes that are cached in memory
   List<DatabaseNotes> _notes = [];
 
-// a stream controller that emits the cached notes
-  final _notesStreamController =
-      StreamController<List<DatabaseNotes>>.broadcast();
+  late final StreamController<List<DatabaseNotes>> _notesStreamController;
 
 // reads all notes from the database and caches them in memory through the _notesStreamController
   Future<void> _cacheNotes() async {
