@@ -5,6 +5,7 @@ import 'package:mynotes/constants/routes.dart';
 import 'package:mynotes/enums/menu_actions.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/services/crud/notes_service.dart';
+import 'package:mynotes/views/notes/notes_list_view.dart';
 // import 'dart:developer' as devtols show log;
 
 class NotesView extends StatefulWidget {
@@ -77,22 +78,15 @@ class _NotesViewState extends State<NotesView> {
                           if (snapshot.hasData) {
                             final allNotes =
                                 snapshot.data as List<DatabaseNotes>;
-
-                            return ListView.builder(
-                                itemCount: allNotes.length,
-                                itemBuilder: (context, index) {
-                                  final note = allNotes[index];
-
-                                  return ListTile(
-                                    title: Text(
-                                      note.text,
-                                      maxLines: 1,
-                                      softWrap: true, // to wrap the text
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  );
-                                });
-                            
+                            return NotesListView(
+                              notes: allNotes,
+                              onDeleteNote: (note) async {
+                                await _notesService.deleteNote(
+                                  id: note.id,
+                                );  
+                              },
+                            );
+       
                           } else {
                             return const Center(
                                 child: Text('You have no notes yet'));
@@ -109,27 +103,6 @@ class _NotesViewState extends State<NotesView> {
           },
         ));
   }
-}
-
-Future<bool> showLogOutDialog(BuildContext context) {
-  return showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Are you sure you want to logout?'),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context, false);
-                },
-                child: const Text('No')),
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context, true);
-                },
-                child: const Text('Yes')),
-          ],
-        );
-      }).then((value) => value ?? false);
+  
+  showLogOutDialog(BuildContext context) {}
 }
