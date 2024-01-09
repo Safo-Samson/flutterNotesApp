@@ -38,7 +38,7 @@ class _NotesViewState extends State<NotesView> {
             IconButton(
                 onPressed: () {
                   // pusnNamed() is used to navigate to a route back to the previous route with the back button on the appbar
-                  Navigator.of(context).pushNamed(newNoteRoute);
+                  Navigator.of(context).pushNamed(createOrUpdateNoteRoute);
                 },
                 icon: const Icon(Icons.add)),
             PopupMenuButton<MenuAction>(onSelected: (action) async {
@@ -76,6 +76,7 @@ class _NotesViewState extends State<NotesView> {
                         case ConnectionState.waiting:
                         case ConnectionState.active:
                           if (snapshot.hasData) {
+                            
                             final allNotes =
                                 snapshot.data as List<DatabaseNotes>;
                             return NotesListView(
@@ -83,10 +84,14 @@ class _NotesViewState extends State<NotesView> {
                               onDeleteNote: (note) async {
                                 await _notesService.deleteNote(
                                   id: note.id,
-                                );  
+                                );
+                              },
+                              onTap: (note) {
+                                Navigator.of(context).pushNamed(
+                                    createOrUpdateNoteRoute,
+                                    arguments: note);
                               },
                             );
-       
                           } else {
                             return const Center(
                                 child: Text('You have no notes yet'));
@@ -96,13 +101,13 @@ class _NotesViewState extends State<NotesView> {
                               child: CircularProgressIndicator());
                       }
                     });
-               
+
               default:
                 return const Center(child: CircularProgressIndicator());
             }
           },
         ));
   }
-  
+
   showLogOutDialog(BuildContext context) {}
 }
