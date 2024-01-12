@@ -34,7 +34,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     }
     // the getCurrentUser! is unwarpped (!) because we are sure that the user is logged in
     final currentUser = AuthService.firebase().getCurrentUser!;
-    final email = currentUser.email!;
+    final email = currentUser.email;
     final owner = await _notesService.getUser(email: email);
     final newNote = await _notesService.createNote(owner: owner);
     _note = newNote;

@@ -19,7 +19,7 @@ class _NotesViewState extends State<NotesView> {
   // late keyword means that the variable will be initialized later
   late final NotesService _notesService;
   // get the email of the user from firebase
-  String get userEmail => AuthService.firebase().getCurrentUser!.email!;
+  String get userEmail => AuthService.firebase().getCurrentUser!.email;
   @override
   void initState() {
     _notesService = NotesService();
