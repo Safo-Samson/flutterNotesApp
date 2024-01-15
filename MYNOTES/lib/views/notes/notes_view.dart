@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:mynotes/constants/routes.dart';
 import 'package:mynotes/enums/menu_actions.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
+import 'package:mynotes/services/cloud/cloud_note.dart';
+import 'package:mynotes/services/cloud/firebase_cloud_storage.dart';
 import 'package:mynotes/services/crud/notes_service.dart';
 import 'package:mynotes/views/notes/notes_list_view.dart';
 // import 'dart:developer' as devtols show log;
@@ -17,12 +19,12 @@ class NotesView extends StatefulWidget {
 
 class _NotesViewState extends State<NotesView> {
   // late keyword means that the variable will be initialized later
-  late final NotesService _notesService;
+  late final FirebaseCloudStorage _notesService;
   // get the email of the user from firebase
-  String get userEmail => AuthService.firebase().getCurrentUser!.email;
+  String get userId => AuthService.firebase().getCurrentUser!.id;
   @override
   void initState() {
-    _notesService = NotesService();
+    _notesService = FirebaseCloudStorage();
     // _notesService.open();  this is not needed because any function related to the database will open it automatically because of ensureDbIsOpened() function
     super.initState();
   }
@@ -63,13 +65,9 @@ class _NotesViewState extends State<NotesView> {
             }),
           ],
         ),
-        body: FutureBuilder(
-          future: _notesService.getOrCreateUser(email: userEmail),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.done:
-                return StreamBuilder(
-                    stream: _notesService.allNotes,
+        body: StreamBuilder(
+            stream: _notesService.allNotes(
+                ownerUserId: userId), // get all notes for that user
                     builder: (context, snapshot) {
                       switch (snapshot.connectionState) {
                         // this is called fallthrough case
@@ -78,12 +76,12 @@ class _NotesViewState extends State<NotesView> {
                           if (snapshot.hasData) {
                             
                             final allNotes =
-                                snapshot.data as List<DatabaseNotes>;
+                                snapshot.data as Iterable<CloudNote>;
                             return NotesListView(
                               notes: allNotes,
                               onDeleteNote: (note) async {
                                 await _notesService.deleteNote(
-                                  id: note.id,
+                          documentId: note.documentId,
                                 );
                               },
                               onTap: (note) {
@@ -100,13 +98,7 @@ class _NotesViewState extends State<NotesView> {
                           return const Center(
                               child: CircularProgressIndicator());
                       }
-                    });
-
-              default:
-                return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ));
+            }));
   }
 
 
