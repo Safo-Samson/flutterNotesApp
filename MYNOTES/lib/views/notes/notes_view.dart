@@ -6,7 +6,6 @@ import 'package:mynotes/enums/menu_actions.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/services/cloud/cloud_note.dart';
 import 'package:mynotes/services/cloud/firebase_cloud_storage.dart';
-import 'package:mynotes/services/crud/notes_service.dart';
 import 'package:mynotes/views/notes/notes_list_view.dart';
 // import 'dart:developer' as devtols show log;
 
