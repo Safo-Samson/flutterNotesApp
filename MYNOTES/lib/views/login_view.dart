@@ -6,9 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'dart:developer' as devtols show log;
 import 'package:mynotes/constants/routes.dart';
 import 'package:mynotes/services/auth/auth_exceptions.dart';
-import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/services/auth/bloc/auth_bloc.dart';
 import 'package:mynotes/services/auth/bloc/auth_event.dart';
+import 'package:mynotes/services/auth/bloc/auth_state.dart';
 import 'package:mynotes/utilities/dialogs/error_dialog.dart';
 
 class LoginView extends StatefulWidget {
@@ -68,40 +68,28 @@ class _LoginViewState extends State<LoginView> {
                 hintText: 'Enter your password',
                 border: OutlineInputBorder(),
               )),
-          TextButton(
-            onPressed: () async {
-              final email = _emailController.text;
-              final password = _passwordController.text;
-              try {
-                context.read<AuthBloc>().add(AuthEventLogIn(email, password));
-                // AuthService.firebase().logIn(email: email, password: password);
-                // await AuthService.firebase()
-                //     .logIn(email: email, password: password);
-                // // navigate to notes view after sign in and making sure user is verified
-                // final user = AuthService.firebase().getCurrentUser;
-                // if (user?.isEmailVerified ?? false) {
-                //   Navigator.of(context).pushNamedAndRemoveUntil(notesRoute,
-                //       (route) => false); // navigate to notes view after sign in
-                 
-                // } else {
-                //   Navigator.of(context).pushNamedAndRemoveUntil(
-                //       verifyEmailRoute, (route) => false);
-                 
-                // }
-
-              } on UserNotFoundAuthException {
-                await showErrorDialog(context, 'No user found for that email.');
-              } on WrongPasswordAuthException {
-                await showErrorDialog(
-                    context, 'Wrong password provided for that user.');
-              } on GenericAuthException {
-                // catch GenericAuthException
-                await showErrorDialog(context, 'Authentication failed');
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) async {
+              if (state is AuthStateLoggedOut) {
+                if (state.exception is UserNotFoundAuthException) {
+                  await showErrorDialog(
+                      context, 'No user found for that email.');
+                } else if (state.exception is WrongPasswordAuthException) {
+                  await showErrorDialog(
+                      context, 'Wrong credentials provided for that user.');
+                } else if (state.exception is GenericAuthException) {
+                  await showErrorDialog(context, 'Authentication failed');
+                }
               }
-              
-    
             },
-            child: const Text('Login'),
+            child: TextButton(
+              onPressed: () async {
+                final email = _emailController.text;
+                final password = _passwordController.text;
+                context.read<AuthBloc>().add(AuthEventLogIn(email, password));
+              },
+              child: const Text('Login'),
+            ),
           ),
           TextButton(
               onPressed: () {
