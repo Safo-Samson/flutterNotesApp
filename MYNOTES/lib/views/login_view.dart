@@ -24,7 +24,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
-  CloseDiaglog? _closeDialogHandler;
+
 
   @override
   void initState() {
@@ -46,18 +46,7 @@ class _LoginViewState extends State<LoginView> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateLoggedOut) {
-          final closeDiaglog = _closeDialogHandler;
-          // if the state is not loading and the closeDiaglog is opened then close the dialog
-          if (!state.isLoading && closeDiaglog != null) {
-            closeDiaglog();
-            _closeDialogHandler = null;
-          }
-          // if the state is loading and the closeDiaglog is not opened then open the dialog
-          else if (state.isLoading && closeDiaglog == null) {
-            _closeDialogHandler =
-                showLoadingDialog(context: context, text: 'Loading... ');
-          }
-
+    
           if (state.exception is UserNotFoundAuthException) {
             await showErrorDialog(context, 'No user found for that email.');
           } else if (state.exception is WrongPasswordAuthException) {
