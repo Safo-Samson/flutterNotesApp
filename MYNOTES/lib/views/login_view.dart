@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 // import 'dart:developer' as devtols show log;
-import 'package:mynotes/constants/routes.dart';
+// import 'package:mynotes/constants/routes.dart';
 import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:mynotes/services/auth/bloc/auth_bloc.dart';
 import 'package:mynotes/services/auth/bloc/auth_event.dart';
 import 'package:mynotes/services/auth/bloc/auth_state.dart';
 import 'package:mynotes/utilities/dialogs/error_dialog.dart';
+import 'package:mynotes/utilities/dialogs/loading_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -23,6 +24,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
+  CloseDiaglog? _closeDialogHandler;
 
   @override
   void initState() {
@@ -41,48 +43,60 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     // return const Placeholder(color: Colors.red);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login View'),
-      ),
-      body: Column(
-        children: [
-          TextField(
-              controller: _emailController,
-              enableSuggestions: false, // disable suggestions very important
-              autocorrect: false,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                hintText: 'Enter your email',
-                border: OutlineInputBorder(),
-              )),
-          TextField(
-              controller: _passwordController,
-              obscureText: true, // hide password
-              enableSuggestions: false, // disable suggestions very important
-              autocorrect:
-                  false, // disable autocorrect very important foro password
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                hintText: 'Enter your password',
-                border: OutlineInputBorder(),
-              )),
-          BlocListener<AuthBloc, AuthState>(
-            listener: (context, state) async {
-              if (state is AuthStateLoggedOut) {
-                if (state.exception is UserNotFoundAuthException) {
-                  await showErrorDialog(
-                      context, 'No user found for that email.');
-                } else if (state.exception is WrongPasswordAuthException) {
-                  await showErrorDialog(
-                      context, 'Wrong credentials provided for that user.');
-                } else if (state.exception is GenericAuthException) {
-                  await showErrorDialog(context, 'Authentication failed');
-                }
-              }
-            },
-            child: TextButton(
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) async {
+        if (state is AuthStateLoggedOut) {
+          final closeDiaglog = _closeDialogHandler;
+          // if the state is not loading and the closeDiaglog is opened then close the dialog
+          if (!state.isLoading && closeDiaglog != null) {
+            closeDiaglog();
+            _closeDialogHandler = null;
+          }
+          // if the state is loading and the closeDiaglog is not opened then open the dialog
+          else if (state.isLoading && closeDiaglog == null) {
+            _closeDialogHandler =
+                showLoadingDialog(context: context, text: 'Loading... ');
+          }
+
+          if (state.exception is UserNotFoundAuthException) {
+            await showErrorDialog(context, 'No user found for that email.');
+          } else if (state.exception is WrongPasswordAuthException) {
+            await showErrorDialog(
+                context, 'Wrong credentials provided for that user.');
+          } else if (state.exception is GenericAuthException) {
+            await showErrorDialog(context, 'Authentication failed');
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Login View'),
+        ),
+        body: Column(
+          children: [
+            TextField(
+                controller: _emailController,
+                enableSuggestions: false, // disable suggestions very important
+                autocorrect: false,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'Enter your email',
+                  border: OutlineInputBorder(),
+                )),
+            TextField(
+                controller: _passwordController,
+                obscureText: true, // hide password
+                enableSuggestions: false, // disable suggestions very important
+                autocorrect:
+                    false, // disable autocorrect very important foro password
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  hintText: 'Enter your password',
+                  border: OutlineInputBorder(),
+                )),
+           
+            TextButton(
               onPressed: () async {
                 final email = _emailController.text;
                 final password = _passwordController.text;
@@ -90,14 +104,17 @@ class _LoginViewState extends State<LoginView> {
               },
               child: const Text('Login'),
             ),
-          ),
-          TextButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil(registerRoute, (route) => false);
-              },
-              child: const Text('Not registered? Register here')),
-        ],
+          
+            TextButton(
+                onPressed: () {
+                  // Navigator.of(context)
+                  //     .pushNamedAndRemoveUntil(registerRoute, (route) => false);
+
+                  context.read<AuthBloc>().add(const AuthEventShouldRegister());
+                },
+                child: const Text('Not registered? Register here')),
+          ],
+        ),
       ),
     );
   }

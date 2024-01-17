@@ -2,8 +2,9 @@
 
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mynotes/constants/routes.dart';
-import 'package:mynotes/services/auth/auth_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mynotes/services/auth/bloc/auth_bloc.dart';
+import 'package:mynotes/services/auth/bloc/auth_event.dart';
 
 class VerifyEmailView extends StatefulWidget {
   const VerifyEmailView({super.key});
@@ -24,20 +25,23 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
         const Text(
             "If you haven't received an email, please press the button below"),
         TextButton(
-            onPressed: () async {
-              // final user = FirebaseAuth.instance.currentUser;
-              // await user?.sendEmailVerification();
-
-              await AuthService.firebase().sendEmailVerification();
+            onPressed: () {
+             
+              context
+                  .read<AuthBloc>()
+                  .add(const AuthEventSendEmailVerification());
+              // await AuthService.firebase().sendEmailVerification();
             },
             child: const Text('Send verification email')),
         TextButton(
             // in case the user makes a mistake or want to change email or restart the process
-            onPressed: () async {
-              // await FirebaseAuth.instance.signOut();
-              await AuthService.firebase().logOut();
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil(registerRoute, (_) => false);
+            onPressed: () {
+              context.read<AuthBloc>().add(const AuthEventLogOut());
+
+              // // await FirebaseAuth.instance.signOut();
+              // await AuthService.firebase().logOut();
+              // Navigator.of(context)
+              //     .pushNamedAndRemoveUntil(registerRoute, (_) => false);
             },
             child: const Text("restart"))
       ]),
