@@ -10,7 +10,7 @@ import 'package:mynotes/services/auth/bloc/auth_bloc.dart';
 import 'package:mynotes/services/auth/bloc/auth_event.dart';
 import 'package:mynotes/services/auth/bloc/auth_state.dart';
 import 'package:mynotes/utilities/dialogs/error_dialog.dart';
-import 'package:mynotes/utilities/dialogs/loading_dialog.dart';
+
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -48,7 +48,8 @@ class _LoginViewState extends State<LoginView> {
         if (state is AuthStateLoggedOut) {
     
           if (state.exception is UserNotFoundAuthException) {
-            await showErrorDialog(context, 'No user found for that email.');
+            await showErrorDialog(
+                context, 'No user found for that credentials.');
           } else if (state.exception is WrongPasswordAuthException) {
             await showErrorDialog(
                 context, 'Wrong credentials provided for that user.');
@@ -61,48 +62,61 @@ class _LoginViewState extends State<LoginView> {
         appBar: AppBar(
           title: const Text('Login View'),
         ),
-        body: Column(
-          children: [
-            TextField(
-                controller: _emailController,
-                enableSuggestions: false, // disable suggestions very important
-                autocorrect: false,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Enter your email',
-                  border: OutlineInputBorder(),
-                )),
-            TextField(
-                controller: _passwordController,
-                obscureText: true, // hide password
-                enableSuggestions: false, // disable suggestions very important
-                autocorrect:
-                    false, // disable autocorrect very important foro password
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Enter your password',
-                  border: OutlineInputBorder(),
-                )),
-           
-            TextButton(
-              onPressed: () async {
-                final email = _emailController.text;
-                final password = _passwordController.text;
-                context.read<AuthBloc>().add(AuthEventLogIn(email, password));
-              },
-              child: const Text('Login'),
-            ),
-          
-            TextButton(
-                onPressed: () {
-                  // Navigator.of(context)
-                  //     .pushNamedAndRemoveUntil(registerRoute, (route) => false);
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const Text('Plese login with your email and password'),
 
-                  context.read<AuthBloc>().add(const AuthEventShouldRegister());
+              TextField(
+                  controller: _emailController,
+                  enableSuggestions:
+                      false, // disable suggestions very important
+                  autocorrect: false,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    hintText: 'Enter your email',
+                    border: OutlineInputBorder(),
+                  )),
+              TextField(
+                  controller: _passwordController,
+                  obscureText: true, // hide password
+                  enableSuggestions:
+                      false, // disable suggestions very important
+                  autocorrect:
+                      false, // disable autocorrect very important foro password
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                    hintText: 'Enter your password',
+                    border: OutlineInputBorder(),
+                  )),
+              TextButton(
+                onPressed: () async {
+                  final email = _emailController.text;
+                  final password = _passwordController.text;
+                  context.read<AuthBloc>().add(AuthEventLogIn(email, password));
                 },
-                child: const Text('Not registered? Register here')),
-          ],
+                child: const Text('Login'),
+              ),
+              TextButton(
+                  onPressed: () {
+                    // Navigator.of(context)
+                    //     .pushNamedAndRemoveUntil(registerRoute, (route) => false);
+
+                    context
+                        .read<AuthBloc>()
+                        .add(const AuthEventShouldRegister());
+                  },
+                  child: const Text('Not registered? Register here')),
+              TextButton(
+                  onPressed: () {
+                    context.read<AuthBloc>().add(
+                        AuthEventForgotPassword(email: _emailController.text));
+                  },
+                  child: const Text('Forgot password?')),
+            ],
+          ),
         ),
       ),
     );

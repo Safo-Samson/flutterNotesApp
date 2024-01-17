@@ -57,52 +57,59 @@ class _RegisterViewState extends State<RegisterView> {
         appBar: AppBar(
           title: const Text('Register View'),
         ),
-        body: Column(
-          children: [
-            TextField(
-                controller: _emailController,
-                enableSuggestions: false, // disable suggestions very important
-                autocorrect: false,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Enter your email',
-                  border: OutlineInputBorder(),
-                )),
-            TextField(
-                controller: _passwordController,
-                obscureText: true, // hide password
-                enableSuggestions: false, // disable suggestions very important
-                autocorrect:
-                    false, // disable autocorrect very important foro password
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Enter your password',
-                  border: OutlineInputBorder(),
-                )),
-            TextButton(
-              onPressed: () async {
-                final email = _emailController.text;
-                final password = _passwordController.text;
-                
-                context.read<AuthBloc>().add(AuthEventRegister(
-                      email,
-                      password,
-                    ));
-              },
-              child: const Text('Register'),
-            ),
-            TextButton(
-                onPressed: () {
-                  // Navigator.of(context).pushNamedAndRemoveUntil(
-                  //   loginRoute,
-                  //   (route) => false,
-                  // );
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const Text('Plese provide email and password to register'),
+              TextField(
+                  controller: _emailController,
+                  enableSuggestions:
+                      false, // disable suggestions very important
+                  autocorrect: false,
+                  autofocus: true,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    hintText: 'Enter your email',
+                    border: OutlineInputBorder(),
+                  )),
+              TextField(
+                  controller: _passwordController,
+                  obscureText: true, // hide password
+                  enableSuggestions:
+                      false, // disable suggestions very important
+                  autocorrect:
+                      false, // disable autocorrect very important foro password
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                    hintText: 'Enter your password',
+                    border: OutlineInputBorder(),
+                  )),
+              TextButton(
+                onPressed: () async {
+                  final email = _emailController.text;
+                  final password = _passwordController.text;
 
-                  context.read<AuthBloc>().add(const AuthEventLogOut());
+                  context.read<AuthBloc>().add(AuthEventRegister(
+                        email,
+                        password,
+                      ));
                 },
-                child: const Text('Already registered? Login here')),
-          ],
+                child: const Text('Register'),
+              ),
+              TextButton(
+                  onPressed: () {
+                    // Navigator.of(context).pushNamedAndRemoveUntil(
+                    //   loginRoute,
+                    //   (route) => false,
+                    // );
+
+                    context.read<AuthBloc>().add(const AuthEventLogOut());
+                  },
+                  child: const Text('Already registered? Login here')),
+            ],
+          ),
         ),
       ),
     );
