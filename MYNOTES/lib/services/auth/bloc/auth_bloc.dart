@@ -22,6 +22,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       final email = event.email;
       // user just clicked on forgot password without an email
+      // ignore: unnecessary_null_comparison
       if (email == null) return;
 
 // user actually entered an email and clicked on forgot password
