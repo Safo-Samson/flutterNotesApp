@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.mynotes</string>
+	<string>com.kanta.mynotes</string>
 	<key>PROJECT_ID</key>
 	<string>kanta-mynotes</string>
 	<key>STORAGE_BUCKET</key>
