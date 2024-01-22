@@ -18,11 +18,13 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized(); // required by Firebase Core lib
   runApp(MaterialApp(
     title: 'Flutter Demo',
+    debugShowCheckedModeBanner: false,
     theme: ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       useMaterial3: true,
     ),
     home: BlocProvider<AuthBloc>(
+
       create: (context) => AuthBloc(FirebaseAuthProvider()),
       child: const HomePage(),
     ),

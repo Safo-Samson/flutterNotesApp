@@ -64,58 +64,60 @@ class _LoginViewState extends State<LoginView> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const Text('Plese login with your email and password'),
-
-              TextField(
-                  controller: _emailController,
-                  enableSuggestions:
-                      false, // disable suggestions very important
-                  autocorrect: false,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Enter your email',
-                    border: OutlineInputBorder(),
-                  )),
-              TextField(
-                  controller: _passwordController,
-                  obscureText: true, // hide password
-                  enableSuggestions:
-                      false, // disable suggestions very important
-                  autocorrect:
-                      false, // disable autocorrect very important foro password
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter your password',
-                    border: OutlineInputBorder(),
-                  )),
-              TextButton(
-                onPressed: () async {
-                  final email = _emailController.text;
-                  final password = _passwordController.text;
-                  context.read<AuthBloc>().add(AuthEventLogIn(email, password));
-                },
-                child: const Text('Login'),
-              ),
-              TextButton(
-                  onPressed: () {
-                    // Navigator.of(context)
-                    //     .pushNamedAndRemoveUntil(registerRoute, (route) => false);
-
-                    context
-                        .read<AuthBloc>()
-                        .add(const AuthEventShouldRegister());
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const Text('Plese login with your email and password'),
+          
+                TextField(
+                    controller: _emailController,
+                    enableSuggestions:
+                        false, // disable suggestions very important
+                    autocorrect: false,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      hintText: 'Enter your email',
+                      border: OutlineInputBorder(),
+                    )),
+                TextField(
+                    controller: _passwordController,
+                    obscureText: true, // hide password
+                    enableSuggestions:
+                        false, // disable suggestions very important
+                    autocorrect:
+                        false, // disable autocorrect very important foro password
+                    decoration: const InputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Enter your password',
+                      border: OutlineInputBorder(),
+                    )),
+                TextButton(
+                  onPressed: () async {
+                    final email = _emailController.text;
+                    final password = _passwordController.text;
+                    context.read<AuthBloc>().add(AuthEventLogIn(email, password));
                   },
-                  child: const Text('Not registered? Register here')),
-              TextButton(
-                  onPressed: () {
-                    context.read<AuthBloc>().add(
-                        AuthEventForgotPassword(email: _emailController.text));
-                  },
-                  child: const Text('Forgot password?')),
-            ],
+                  child: const Text('Login'),
+                ),
+                TextButton(
+                    onPressed: () {
+                      // Navigator.of(context)
+                      //     .pushNamedAndRemoveUntil(registerRoute, (route) => false);
+          
+                      context
+                          .read<AuthBloc>()
+                          .add(const AuthEventShouldRegister());
+                    },
+                    child: const Text('Not registered? Register here')),
+                TextButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(
+                          AuthEventForgotPassword(email: _emailController.text));
+                    },
+                    child: const Text('Forgot password?')),
+              ],
+            ),
           ),
         ),
       ),

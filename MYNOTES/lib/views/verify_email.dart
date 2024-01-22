@@ -20,31 +20,33 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
       appBar: AppBar(
         title: const Text('Verify Email View'),
       ),
-      body: Column(children: [
-        const Text("We've sent you an email. Please open to verify your email"),
-        const Text(
-            "If you haven't received an email, please press the button below"),
-        TextButton(
-            onPressed: () {
-             
-              context
-                  .read<AuthBloc>()
-                  .add(const AuthEventSendEmailVerification());
-              // await AuthService.firebase().sendEmailVerification();
-            },
-            child: const Text('Send verification email')),
-        TextButton(
-            // in case the user makes a mistake or want to change email or restart the process
-            onPressed: () {
-              context.read<AuthBloc>().add(const AuthEventLogOut());
-
-              // // await FirebaseAuth.instance.signOut();
-              // await AuthService.firebase().logOut();
-              // Navigator.of(context)
-              //     .pushNamedAndRemoveUntil(registerRoute, (_) => false);
-            },
-            child: const Text("restart"))
-      ]),
+      body: SingleChildScrollView( // to avoid overflow
+        child: Column(children: [
+          const Text("We've sent you an email. Please open to verify your email"),
+          const Text(
+              "If you haven't received an email, please press the button below"),
+          TextButton(
+              onPressed: () {
+               
+                context
+                    .read<AuthBloc>()
+                    .add(const AuthEventSendEmailVerification());
+                // await AuthService.firebase().sendEmailVerification();
+              },
+              child: const Text('Send verification email')),
+          TextButton(
+              // in case the user makes a mistake or want to change email or restart the process
+              onPressed: () {
+                context.read<AuthBloc>().add(const AuthEventLogOut());
+      
+                // // await FirebaseAuth.instance.signOut();
+                // await AuthService.firebase().logOut();
+                // Navigator.of(context)
+                //     .pushNamedAndRemoveUntil(registerRoute, (_) => false);
+              },
+              child: const Text("restart"))
+        ]),
+      ),
     );
   }
 }
